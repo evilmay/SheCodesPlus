@@ -1,0 +1,90 @@
+
+.location {
+    font-weight: 300;
+}
+
+#locationAdd {
+    font-size: 20px;
+}
+
+.container {
+    max-width: 50%;
+    border: 2px solid rgb(123, 1, 237);
+    padding: 20px 20px;
+    border-radius: 4px;
+}
+
+.warning {
+    border: 1px solid black;
+    padding: 10px;
+}
+
+#fire {
+    color: red;
+}
+
+.minTemp {
+    margin: 0 10px;
+    padding-bottom: 10px;
+}
+
+.minTemp p:first-child {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.forecast {
+    text-align: center;
+}
+
+.forecast p {
+    padding-top: 5px;
+}
+
+.forecast i {
+    color: rgb(79, 76, 93);
+    font-size: 40px;
+}
+
+.forecast i:hover {
+    cursor: pointer;
+    color: rgb(255, 204, 0);
+    transition: ease-in-out 200ms;
+}
+
+.todayTemp {
+    text-align: center;
+}
+
+.row {
+    padding: 20px 10px;
+}
+
+.col-6 {
+    text-align: center;
+}
+
+.fa-sun {
+    color: rgb(255, 204, 0);
+    font-size: 148px;
+}
+
+.col-3 p {
+    margin-bottom: 0;
+}
+
+h3 {
+    font-size: 20px;
+}
+
+.search-bar {
+    margin: 5px;
+}
+
+.submit {
+    margin: 5px;
+}
+
+.current-position {
+    margin: 5px;
+}
