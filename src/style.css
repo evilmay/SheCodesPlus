@@ -64,10 +64,6 @@
     text-align: center;
 }
 
-.fa-sun {
-    color: rgb(255, 204, 0);
-    font-size: 148px;
-}
 
 .col-3 p {
     margin-bottom: 0;
@@ -86,6 +82,10 @@ h3 {
 }
 
 .current-position {
+    margin: 5px;
+}
+
+.unit-conversion {
     margin: 5px;
 }
 
