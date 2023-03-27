@@ -17,6 +17,14 @@ function getToday() {
     minutes: minutes,
   }
 }
+
+function getForecastDayName(daysSinceToday) {
+  let now = new Date();
+  let days = ["Sun", "Mon", "Tues", "Wed", "Thu", "Fri", "Sat"];
+  let forecastIndex = (now.getDay() + daysSinceToday) % 7;
+  return days [forecastIndex];
+}
+
 function setTime(currentTime) {
   let dateTime = document.querySelector("h3");
   dateTime.innerHTML = `${currentTime.day}, ${currentTime.hours}:${currentTime.minutes}`;
@@ -26,7 +34,7 @@ function initialisePosition(position) {
   let latitude = position.coords.latitude;
   let longitude = position.coords.longitude;
   if(latitude && longitude) {
-    let url = getApiUrl({  
+    let url = getCurrentWeatherApiUrl({
       latitude, 
       longitude, 
     });
@@ -45,7 +53,7 @@ input = {
   city,
 } 
 */
-function getApiUrl(apiData) {
+function getCurrentWeatherApiUrl(apiData) {
   let apiKey = "5201594abea9f3e38b70e65b11a80c24";
   let apiUrl = `https://api.openweathermap.org/data/2.5/weather?appid=${apiKey}&units=metric`;
 
@@ -73,13 +81,19 @@ function getWeatherInformation(apiUrl) {
       rainfall: weather.rain ? weather.rain : 0,
       weatherIcon: weather.weather[0].icon,
     });
+
+    let latitude = response.data.coord.lat;
+    let longitude = response.data.coord.lon;
+    updateForecast(latitude, longitude);
   });
 }
 
-function displayWeatherIcon(weatherIconCode, weatherDescription) {
-  let weatherIcon = document.querySelector("#weatherIcon");
 
-  const url = `http://openweathermap.org/img/wn/${weatherIconCode}@4x.png`;
+
+function displayWeatherIcon(weatherIconCode, weatherDescription, id, size) {
+  let weatherIcon = document.querySelector(`${id}`);
+
+  const url = `http://openweathermap.org/img/wn/${weatherIconCode}@${size}.png`;
 
   weatherIcon.setAttribute("src", url);
   weatherIcon.setAttribute('alt', weatherDescription);
@@ -98,27 +112,19 @@ input = {
 } 
 */
 function displayWeatherInformation(weather) {
-  let cityName = document.querySelector("#cityName");
-  let currentTemperature = document.querySelector("#currentTemperature");
-  let minimumTemperature = document.querySelector("#minimumTemperature");
-  let windSpeed = document.querySelector("#windSpeed");
-  let humidity = document.querySelector("#humidity");  
-  let description = document.querySelector("#description");
-  let rainfall = document.querySelector("#rainfall");
+  displayOnHtml("#cityName", `${weather.cityName}`);
+  displayOnHtml("#currentTemperature", `${weather.currentTemperature}°C`);
+  displayOnHtml("#minimumTemperature", `${weather.minimumTemperature}°C`);
+  displayOnHtml("#windSpeed", `Wind: ${weather.windSpeed}m/sec`);
+  displayOnHtml("#humidity", `Humidity: ${weather.humidity}%`);
+  displayOnHtml("#description", `${weather.description}`);
+  displayOnHtml("#rainfall", `${weather.rainfall}mm`);
 
-  cityName.innerHTML = `${weather.cityName}`;
-  currentTemperature.innerHTML = `${weather.currentTemperature}°C`;
-  minimumTemperature.innerHTML = `${weather.minimumTemperature}°C`;
-  windSpeed.innerHTML = `Wind: ${weather.windSpeed}m/sec`;
-  humidity.innerHTML = `Humidity: ${weather.humidity}%`;
-  description.innerHTML = `${weather.description}`;
-  rainfall.innerHTML = `${weather.rainfall}mm`;
-
-  displayWeatherIcon(weather.weatherIcon, weather.description);
+  displayWeatherIcon(weather.weatherIcon, weather.description, "#weatherIcon", "4x");
 }
 
 function displayOnHtml(id, message) {
-  let element = document.querySelector(`#${id}`);
+  let element = document.querySelector(`${id}`);
   element.innerHTML = message;
 }
 
@@ -126,8 +132,90 @@ function searchCity(event) {
   event.preventDefault();
   setTime(getToday());
   let searchInput = document.querySelector("#search-city-input");
-  let url = getApiUrl({city: searchInput.value});
+  let url = getCurrentWeatherApiUrl({city: searchInput.value});
   getWeatherInformation(url);
+}
+
+function getForecastApiUrl(latitude, longitude) {
+  let forecastApiKey = "3ea208daca9158focfbta47e6bf32fe7";
+  return `https://api.shecodes.io/weather/v1/forecast?lon=${longitude}&lat=${latitude}&key=${forecastApiKey}&units=metric`;
+}
+/*
+"description": "sky is clear",
+    "icon_url": "http://shecodes-assets.s3.amazonaws.com/api/weather/icons/clear-sky-day.png",
+                "temperature": {
+                "day": 30.78,
+                "minimum": 15.44,
+                "maximum": 31.66,
+                "humidity": 27
+            },
+ */
+
+function getForecastWeatherInformation(forecastUrl) {
+  axios.get(forecastUrl).then(function (response) {
+    let data = response.data.daily;
+    let apiData = [];
+
+    data.forEach((dayData, index) => {
+      if(index >= 6) {
+        return
+      }
+
+      apiData.push({
+          dayName: getForecastDayName(index + 1),
+          maximumTemperature: Math.round(dayData.temperature.maximum),
+          minimumTemperature: Math.round(dayData.temperature.minimum),
+          icon_url: dayData.condition.icon_url,
+          weatherDescription: dayData.condition.description,
+          weatherHtmlId: `#weather-${index}`,
+          temperatureHtmlId: `#temperature-${index}`,
+          dayNameHtmlId: `#day-${index}`,
+        })
+    })
+
+    displayForecastWeather(apiData);
+
+  });
+}
+
+
+
+function displayForecastWeather(forecastApiData) {
+  /*
+    input = [
+      dayName
+      maximumTemperature
+      minimumTemperature
+      icon_url
+      weatherDescription
+      weatherHtmlId
+      temperatureHtmlId
+      dayNameHtmlId
+    ]
+   */
+  function displayForecastDay(information) {
+    displayOnHtml(information.dayNameHtmlId, `${information.dayName}`);
+    displayOnHtml(information.temperatureHtmlId, `${information.minimumTemperature} | ${information.maximumTemperature}`);
+    displayForecastWeatherIcon(information.icon_url, information.weatherDescription, information.weatherHtmlId);
+  }
+
+  function displayForecastWeatherIcon(weatherIconCode, weatherDescription, id) {
+    let weatherIcon = document.querySelector(`${id}`);
+
+    const url = `${weatherIconCode}`;
+
+    weatherIcon.setAttribute("src", url);
+    weatherIcon.setAttribute('alt', weatherDescription);
+  }
+
+  forecastApiData.forEach((day) => {
+    displayForecastDay(day);
+  });
+}
+
+function updateForecast(latitude, longitude) {
+  let url = getForecastApiUrl(latitude, longitude);
+  getForecastWeatherInformation(url);
 }
 
 function searchCurrentLocation(event) {
@@ -137,11 +225,11 @@ function searchCurrentLocation(event) {
 }
 
 function celsiusToFahrenheit(temperature) {
-  return temperature * 9/5 + 32;
+  return Math.round(temperature * 9/5 + 32);
 }
 
 function fahrenheitToCelsius(temperature) {
-  return (temperature - 32)* 5/9;
+  return Math.round((temperature - 32)* 5/9);
 }
 
 function convertTemperature() {
@@ -164,8 +252,39 @@ function convertTemperature() {
     unitConversionButton.innerHTML = `°${metric === "F" ? "C" : "F"}`;
   }
 
-  let rawTemperature = getTemperature();
+  function updateForecastTemperature(metric){
+    for (let i = 0; i < 6; i++) {
+      let rawTemperature = getForecastTemperature(i);
+      let convertedTemperature = convertForecastTemperature(rawTemperature, metric);
+      displayForecastTemperature(i, convertedTemperature);
+    }
+  }
 
+  function getForecastTemperature(index) {
+    return document.querySelector(`#temperature-${index}`).innerHTML;
+  }
+
+  function convertForecastTemperature(rawTemperature, metric) {
+    let elements = rawTemperature.split(" ");
+    if (metric === "c"){
+      return {
+        min: celsiusToFahrenheit(elements[0]),
+        max: celsiusToFahrenheit(elements[2]),
+      }
+    } else {
+      return {
+        min: fahrenheitToCelsius(elements[0]),
+        max: fahrenheitToCelsius(elements[2]),
+      }
+    }
+  }
+
+  function displayForecastTemperature(id, convertedTemperature) {
+    displayOnHtml(`#temperature-${id}`, `${convertedTemperature.min} | ${convertedTemperature.max}`)
+  }
+
+  let rawTemperature = getTemperature();
+  updateForecastTemperature(rawTemperature.metric.toLocaleLowerCase());
   if(rawTemperature.metric.toLocaleLowerCase() === "c") {
     rawTemperature.currentTemperature = celsiusToFahrenheit(rawTemperature.currentTemperature);
     rawTemperature.minimumTemperature = celsiusToFahrenheit(rawTemperature.minimumTemperature);

@@ -8,10 +8,13 @@
 }
 
 .container {
-    max-width: 50%;
-    border: 2px solid rgb(123, 1, 237);
+    background-color: white;
+    max-width: 45%;
+    border: 5px solid rgb(000);
     padding: 20px 20px;
-    border-radius: 4px;
+    border-radius: 10px;
+    margin-top: 5%;
+    box-shadow: 0px 0px 30px 5px dimgrey;
 }
 
 .warning {
@@ -83,12 +86,92 @@ h3 {
 
 .current-position {
     margin: 5px;
+    border-radius: 3px;
+}
+
+.forecast-icon {
+    margin: auto;
+    width: 100%;
 }
 
 .unit-conversion {
     margin: 5px;
+    border-radius: 3px;
 }
 
 .author {
-   margin-left: 25%;
+    margin-left: 30%;
+}
+.author a {
+    color: white;
+    text-shadow: 2px 2px 5px dimgrey;
+}
+body {
+    margin: auto;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: auto;
+    background: linear-gradient(315deg, rgba(99,69,90,0.8) 3%, rgba(172,109,126,0.8) 28%, rgba(184,92,78,0.8) 48%, rgba(237,120,85,0.8) 68%, rgba(255,164,119,0.8) 80%, rgba(254,188,123,0.8) 90%);
+    animation: gradient 20s ease infinite;
+    background-size: 400% 400%;
+    background-attachment: fixed;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.wave {
+    background: rgb(255 255 255 / 25%);
+    border-radius: 1000% 1000% 0 0;
+    position: fixed;
+    width: 200%;
+    height: 12em;
+    animation: wave 10s -3s linear infinite;
+    transform: translate3d(0, 0, 0);
+    opacity: 0.8;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.wave:nth-of-type(2) {
+    bottom: -1.25em;
+    animation: wave 18s linear reverse infinite;
+    opacity: 0.8;
+}
+
+.wave:nth-of-type(3) {
+    bottom: -2.5em;
+    animation: wave 20s -1s reverse infinite;
+    opacity: 0.9;
+}
+
+@keyframes wave {
+    2% {
+        transform: translateX(1);
+    }
+
+    25% {
+        transform: translateX(-25%);
+    }
+
+    50% {
+        transform: translateX(-50%);
+    }
+
+    75% {
+        transform: translateX(-25%);
+    }
+
+    100% {
+        transform: translateX(1);
+    }
 }
